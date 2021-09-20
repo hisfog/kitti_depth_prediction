@@ -50,7 +50,7 @@ class DataLoadPreprocess(Dataset):
             with open(args.filenames_file, 'r') as f:
                 self.filenames = filenames_file.readlines()
         self.mode = mode
-        self.transfrom = transfrom
+        self.transform = transform
         self.to_tensor = ToTensor#implemented below
         self.is_for_online_eval = is_for_online_eval
 
@@ -83,8 +83,20 @@ class DataLoadPreprocess(Dataset):
             image = np.asarray(image, dtype=np.float32) / 255.0
             depth_gt = np.asarray(depth_gt, dtype=np.float32)
             depth_gt = np.expand_dims(depth_gt, axis=2)#important
+            
+            depth_gt = depth_gt / 256.0
 
             image, depth_gt = self.random_crop(image, depth_gt, self.args.input_height, self.args.input_width)
+            image, depth_gt = self.train_preprocess(image, depth_gt)
+            sample = {'image': image, 'depth': depth_gt, 'focal': focal}
+        else:
+            print('test and online_eval is not supported yet.')
+
+        if self.transform:
+            sample = self.transform(sample)
+        
+        return sample
+        #end of __getitem__ ,path image to np.ndarray
 
     def random_crop(self, img, depth, height, width):
         assert img.shape[0] >= height
@@ -96,6 +108,7 @@ class DataLoadPreprocess(Dataset):
         img = img[y:y+height , x:x+width, :]
         depth = depth[y:y+height ,x:x+width, :]#confirmed final input size is height*width
         return img, depth
+        #np.ndarray to np.ndarray
 
     def train_preprocess(self, image, depth_gt):
         # do random flipping
@@ -110,8 +123,9 @@ class DataLoadPreprocess(Dataset):
             image = self.agument_image(image)
 
         return image, depth_gt
+        #np.ndarray to np.ndarray
 
-    def agument_image():
+    def agument_image(self, image):
         #gamma agumention
         gamma = random.uniform(0.9, 1.1)
         image_aug = image ** gamma
@@ -129,6 +143,7 @@ class DataLoadPreprocess(Dataset):
         image_aug *= color_image
         image_aug = np.clip(image_aug, 0, 1)
         return image_aug
+        #np.ndarray to np.ndarray
 
     def __len__():
         return len(self.filenames)
@@ -187,5 +202,6 @@ class ToTensor(object):
             return img.float()
         else：
         return img
+        # np.ndarray to tensor for most of the time
 
 
