@@ -70,8 +70,8 @@ class DataLoadPreprocess(Dataset):
             if self.args.do_kb_crop is True:
                 height = image.height
                 width = image.width
-                top_margin = int(height - 352)#352?
-                left_margin = int((width - 1216)/2)#why divied by 2
+                top_margin = int(height - 352)#352? ans:In KITTI benchmark, the provided test images have been cropped to 352 x 1216, but train image size is 375*1242 
+                left_margin = int((width - 1216)/2)#why divied by 2 ans:ensured the cropped image just in the center of source image
                 depth_gt = depth_gt.crop((left_margin, top_margin, left_margin + 1216, top_margin + 352))
                 image = image.crop((left_margin, top_margin, left_margin + 1216, top_margin + 352))
 
