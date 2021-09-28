@@ -131,24 +131,44 @@ def run_one_epoch(path_image, path_gt):
 
 if __name__ == '__main__':
     torch.autograd.set_detect_anomaly(True)
-    train_file = open("train.txt")
-    train_ = train_file.readline()
-    groundtruth_file = open("groundtruth.txt")
-    groundtruth_ = groundtruth_file.readline()
-
-    while train_ and groundtruth_:
+    data_file = open('train_with_gt.txt')
+    line = data_file.readline()
+    while line :
+        train_ = line.split()[0]
+        groundtruth_ = line.split()[1]
         run_one_epoch(train_.strip('\n'), groundtruth_.strip('\n'))
         print('step {} done'.format(int(iter)))
-        train_ = train_file.readline()
-        groundtruth_ = groundtruth_file.readline()
+        line = data_file.readline()
 
-
-    train_file.close()
-    groundtruth_file.close() 
-    
+    data_file.close()    
     torch.save(model, './resnet_encoder.pkl')
     torch.save(decoder, './decoder.pkl')
     print('training done, models saved')    
+
+
+
+
+
+# if __name__ == '__main__':
+#     torch.autograd.set_detect_anomaly(True)
+#     train_file = open("train_shuffled.txt")
+#     train_ = train_file.readline()
+#     groundtruth_file = open("groundtruth.txt")
+#     groundtruth_ = groundtruth_file.readline()
+
+#     while train_ and groundtruth_:
+#         run_one_epoch(train_.strip('\n'), groundtruth_.strip('\n'))
+#         print('step {} done'.format(int(iter)))
+#         train_ = train_file.readline()
+#         groundtruth_ = groundtruth_file.readline()
+
+
+#     train_file.close()
+#     groundtruth_file.close() 
+    
+#     torch.save(model, './resnet_encoder.pkl')
+#     torch.save(decoder, './decoder.pkl')
+#     print('training done, models saved')    
 
 
 
