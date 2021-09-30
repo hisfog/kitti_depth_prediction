@@ -61,7 +61,17 @@ def get_smooth_loss(disp, img):
 
     return grad_disp_x.mean() + grad_disp_y.mean()
 
-def silog_loss(depth_est, depth_gt, mask):
+def silog_loss_function(depth_est, depth_gt, mask):
     variance_focus = 0.85
     d = torch.log(depth_est[mask]) - torch.log(depth_gt[mask])
-    return torch.sqrt((d ** 2).mean() - variance_focus * (d.mean() ** 2)) * 10.0
+    return torch.sqrt((d ** 2).mean() - variance_focus * (d.mean() ** 2) + 1e-6) * 10.0
+
+class silog_loss(nn.Module):
+    def __init__(self, variance_focus):
+        super(silog_loss, self).__init__()
+        self.variance_focus = variance_focus
+
+    def forward(self, depth_est, depth_gt, mask):
+        d = torch.log(depth_est[mask]) - torch.log(depth_gt[mask])
+        return torch.sqrt((d ** 2).mean() - self.variance_focus * (d.mean() ** 2) + 1e-5) * 10.0
+
