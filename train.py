@@ -69,6 +69,7 @@ def run_one_epoch(path_image, path_gt):
 
     features = []
     x = (img - 0.45) / 0.225#have to valid
+    print(x.shape)
     # x.requires_grad_(True)#
     # print(x.requires_grad)#
     x = encoder.conv1(x)
